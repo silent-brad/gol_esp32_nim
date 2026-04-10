@@ -1,0 +1,10 @@
+build/
+sdkconfig
+sdkconfig.old
+main/nimcache/
+managed_components/
+dependencies.lock
+*.o
+*.a
+tmp
+result
