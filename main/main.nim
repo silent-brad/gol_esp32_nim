@@ -1,24 +1,7 @@
 import std/options
+import nesper
+import nesper/esp/esp_timer
 import display, touch, simulation
-
-# --- FreeRTOS / ESP-IDF C bindings ---
-
-proc esp_log_write(level: cint, tag: cstring, fmt: cstring) {.
-  importc: "esp_log_write", header: "esp_log.h", varargs.}
-
-proc esp_timer_get_time(): int64 {.
-  importc: "esp_timer_get_time", header: "esp_timer.h".}
-
-proc v_task_delay(ticks: uint32) {.
-  importc: "vTaskDelay", header: "freertos/FreeRTOS.h".}
-
-proc pd_ms_to_ticks(ms: uint32): uint32 {.
-  importc: "pdMS_TO_TICKS", header: "freertos/FreeRTOS.h".}
-
-const ESP_LOG_INFO = 3.cint
-
-proc logi(tag: cstring, msg: cstring) =
-  esp_log_write(ESP_LOG_INFO, tag, "%s\n", msg)
 
 proc now_ms(): uint64 =
   uint64(esp_timer_get_time() div 1000)
@@ -105,7 +88,7 @@ const FONT_DATA: array[128, array[7, uint8]] = block:
 
   data
 
-proc drawChar(fb: var Framebuffer, cx, cy: uint32, ch: char, color: uint16) =
+proc draw_char(fb: var Framebuffer, cx, cy: uint32, ch: char, color: uint16) =
   let idx = ord(ch)
   if idx < 0 or idx >= 128:
     return
@@ -141,7 +124,7 @@ let BUTTONS = [
 # --- Color mapping ---
 
 proc label_to_color(label: uint16): uint16 =
-  var h = label * 0x9E37'u16
+  var h = label * 0x9_e37'u16
   h = h xor (h shr 7)
   h = h * 0x5F35'u16
   let r = ((h shr 0) and 0x1_f) or 0x08
@@ -157,35 +140,24 @@ proc render_grid(fb: var Framebuffer, sim: Simulation) =
       let lbl = sim.label(gx, gy)
       let px = gx.uint32 * CELL_SIZE
       let py = gy.uint32 * CELL_SIZE
-      if lbl != 0:
-        let color = label_to_color(lbl)
-        # Draw inner 3x3 (leaving 1px grid border)
-        for dy in 0'u32 ..< (CELL_SIZE - 1):
-          for dx in 0'u32 ..< (CELL_SIZE - 1):
-            fb.set_pixel(px + dx, py + dy, color)
-        # Grid line pixels stay as grid color
-        for dx in 0'u32 ..< CELL_SIZE:
-          fb.setPixel(px + dx, py + CELL_SIZE - 1, COLOR_GRID)
-        for dy in 0'u32 ..< CELL_SIZE:
-          fb.set_pixel(px + CELL_SIZE - 1, py + dy, COLOR_GRID)
-      else:
-        # Dead cell: background with grid lines
-        for dy in 0'u32 ..< (CELL_SIZE - 1):
-          for dx in 0'u32 ..< (CELL_SIZE - 1):
-            fb.set_pixel(px + dx, py + dy, COLOR_BG)
-        for dx in 0'u32 ..< CELL_SIZE:
-          fb.setPixel(px + dx, py + CELL_SIZE - 1, COLOR_GRID)
-        for dy in 0'u32 ..< CELL_SIZE:
-          fb.set_pixel(px + CELL_SIZE - 1, py + dy, COLOR_GRID)
+      let fill = if lbl != 0: label_to_color(lbl) else: COLOR_BG
+      for dy in 0'u32 ..< (CELL_SIZE - 1):
+        for dx in 0'u32 ..< (CELL_SIZE - 1):
+          fb.set_pixel(px + dx, py + dy, fill)
+      for dx in 0'u32 ..< CELL_SIZE:
+        fb.set_pixel(px + dx, py + CELL_SIZE - 1, COLOR_GRID)
+      for dy in 0'u32 ..< CELL_SIZE:
+        fb.set_pixel(px + CELL_SIZE - 1, py + dy, COLOR_GRID)
 
 proc render_ui(fb: var Framebuffer, state: SimulationState, generation: uint64,
               step_interval: uint32) =
   let bar_y = DISPLAY_HEIGHT - UI_BAR_H
+  let text_y = bar_y + (UI_BAR_H - FONT_H.uint32) div 2
 
   # Fill UI bar
   for y in bar_y ..< DISPLAY_HEIGHT:
     for x in 0'u32 ..< DISPLAY_WIDTH:
-      fb.setPixel(x, y, COLOR_UI_BG)
+      fb.set_pixel(x, y, COLOR_UI_BG)
 
   # Draw buttons
   for btn in BUTTONS:
@@ -198,26 +170,22 @@ proc render_ui(fb: var Framebuffer, state: SimulationState, generation: uint64,
         label = "PLAY"
         color = COLOR_UI_ACCENT
 
-    let textY = barY + (UI_BAR_H - FONT_H.uint32) div 2
-    let textX = btn.x0 + ((btn.x1 - btn.x0) - label.len.uint32 * (FONT_W + 1).uint32) div 2
-    drawText(fb, textX, textY, label, color)
+    let text_x = btn.x0 + ((btn.x1 - btn.x0) - label.len.uint32 * (FONT_W + 1).uint32) div 2
+    draw_text(fb, text_x, text_y, label, color)
 
   # Generation counter + speed on right side
-  let genStr = "GEN:" & $generation
-  drawText(fb, 480, barY + (UI_BAR_H - FONT_H.uint32) div 2, genStr, COLOR_UI_TEXT)
-
-  let spdStr = "SPD:" & $stepInterval
-  drawText(fb, 680, barY + (UI_BAR_H - FONT_H.uint32) div 2, spdStr, COLOR_UI_TEXT)
+  draw_text(fb, 480, text_y, "GEN:" & $generation, COLOR_UI_TEXT)
+  draw_text(fb, 680, text_y, "SPD:" & $step_interval, COLOR_UI_TEXT)
 
 proc render(fb: var Framebuffer, sim: Simulation, state: SimulationState,
-            stepInterval: uint32) =
+            step_interval: uint32) =
   renderGrid(fb, sim)
-  renderUi(fb, state, sim.generation, stepInterval)
+  renderUi(fb, state, sim.generation, step_interval)
 
 # --- Touch handling ---
 
 proc handleButton(x: int32, sim: var Simulation, state: var SimulationState,
-                  stepInterval: var uint32) =
+                  step_interval: var uint32) =
   for i, btn in BUTTONS:
     if x.uint32 >= btn.x0 and x.uint32 < btn.x1:
       case i
@@ -232,20 +200,20 @@ proc handleButton(x: int32, sim: var Simulation, state: var SimulationState,
       of 3:  # RANDOM
         sim.randomize()
       of 4:  # SPD-
-        if stepInterval < 30:
-          stepInterval += 1
+        if step_interval < 30:
+          step_interval += 1
       of 5:  # SPD+
-        if stepInterval > 1:
-          stepInterval -= 1
+        if step_interval > 1:
+          step_interval -= 1
       break
 
 proc handleTouch(event: TouchEvent, sim: var Simulation,
-                 state: var SimulationState, stepInterval: var uint32,
+                 state: var SimulationState, step_interval: var uint32,
                  drawing: var bool, drawValue: var uint8) =
   case event.phase
   of Started:
     if event.y.uint32 >= GRID_AREA_H:
-      handleButton(event.x, sim, state, stepInterval)
+      handleButton(event.x, sim, state, step_interval)
     else:
       let gx = event.x div CELL_SIZE.int32
       let gy = event.y div CELL_SIZE.int32
@@ -278,10 +246,10 @@ proc app_main() {.exportc.} =
   sim.randomize()
 
   var state = Running
-  var stepInterval = STEP_INTERVAL_DEFAULT
-  var stepCounter = 0'u32
+  var step_interval = STEP_INTERVAL_DEFAULT
+  var step_counter = 0'u32
   var frame_count = 0'u32
-  var fpsTimer = nowMs()
+  var fps_timer = nowMs()
   var drawing = false
   var drawValue = 1'u8
 
@@ -317,8 +285,7 @@ proc app_main() {.exportc.} =
       let elapsed = now_ms() - fps_timer
       if elapsed > 0:
         let fps = (frame_count.uint64 * 1000) div elapsed
-        let fpsMsg: string = "FPS: " & $fps
-        logi(TAG, fpsMsg.cstring)
+        logi(TAG, "FPS: %llu", fps)
       frame_count = 0
       fps_timer = now_ms()
 

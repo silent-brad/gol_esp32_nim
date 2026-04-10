@@ -1,4 +1,4 @@
-proc esp_random(): uint32 {.importc: "esp_random", header: "esp_random.h".}
+import nesper/esp/esp_system
 
 type
   SimulationState* = enum

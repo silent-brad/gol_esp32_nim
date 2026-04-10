@@ -8,8 +8,8 @@ string(JSON NIM_LIB_PATH GET "${NIM_DUMP_JSON}" "libpath")
 message(STATUS "Nim lib path (nimbase.h): ${NIM_LIB_PATH}")
 
 idf_component_register(
-    SRC_DIRS "./nimcache"
-    INCLUDE_DIRS "${NIM_LIB_PATH}"
+    SRC_DIRS "./nimcache" "."
+    INCLUDE_DIRS "${NIM_LIB_PATH}" "."
 )
 
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-label APPEND)
@@ -23,4 +23,3 @@ idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=nonnull APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-error=address APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-but-set-variable APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS -Wno-incompatible-pointer-types APPEND)
-idf_build_set_property(C_COMPILE_OPTIONS -Wno-unused-local-typedefs APPEND)

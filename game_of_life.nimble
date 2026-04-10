@@ -6,3 +6,4 @@ license       = "MIT"
 
 # Dependencies
 requires "nim >= 2.0.0"
+requires "nesper >= 0.10.0"
