@@ -11,10 +11,10 @@ proc now_ms(): uint64 =
 const
   CELL_SIZE = 4'u32
   UI_BAR_H = 32'u32
-  GRID_W = (DISPLAY_WIDTH div CELL_SIZE).int        # 200
-  GRID_H = ((DISPLAY_HEIGHT - UI_BAR_H) div CELL_SIZE).int  # 112
-  GRID_AREA_H = (GRID_H.uint32 * CELL_SIZE)         # 448
-  FRAME_MS = 33'u64                                   # ~30 FPS
+  GRID_W = (DISPLAY_WIDTH div CELL_SIZE).int               # 200
+  GRID_H = ((DISPLAY_HEIGHT - UI_BAR_H) div CELL_SIZE).int # 112
+  GRID_AREA_H = (GRID_H.uint32 * CELL_SIZE)                # 448
+  FRAME_MS = 33'u64                                        # ~30 FPS
   STEP_INTERVAL_DEFAULT = 2'u32
 
 # --- Colors (RGB565) ---
@@ -24,7 +24,7 @@ const
   COLOR_GRID = 0x18E3'u16
   COLOR_UI_BG = 0x2104'u16
   COLOR_UI_TEXT = 0xFFFF'u16
-  COLOR_UI_ACCENT = 0x07_e0'u16
+  COLOR_UI_ACCENT = 0x07E0'u16
 
 # --- Font (minimal 5x7 bitmask for A-Z, 0-9, +, -, :, space) ---
 
@@ -59,32 +59,32 @@ const FONT_DATA: array[128, array[7, uint8]] = block:
   data[58] = [0x00'u8, 0x04, 0x00, 0x00, 0x00, 0x04, 0x00]
 
   # A-Z (65-90)
-  data[65] = [0x0E'u8, 0x11, 0x11, 0x1_f, 0x11, 0x11, 0x11]  # A
-  data[66] = [0x1_e'u8, 0x11, 0x11, 0x1E, 0x11, 0x11, 0x1E]  # B
-  data[67] = [0x0E'u8, 0x11, 0x10, 0x10, 0x10, 0x11, 0x0_e]  # C
-  data[68] = [0x1_e'u8, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1E]  # D
-  data[69] = [0x1F'u8, 0x10, 0x10, 0x1_e, 0x10, 0x10, 0x1_f]  # E
-  data[70] = [0x1_f'u8, 0x10, 0x10, 0x1E, 0x10, 0x10, 0x10]  # F
-  data[71] = [0x0E'u8, 0x11, 0x10, 0x17, 0x11, 0x11, 0x0_f]  # G
-  data[72] = [0x11'u8, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11]  # H
-  data[73] = [0x0E'u8, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0_e]  # I
-  data[74] = [0x07'u8, 0x02, 0x02, 0x02, 0x02, 0x12, 0x0C]  # J
-  data[75] = [0x11'u8, 0x12, 0x14, 0x18, 0x14, 0x12, 0x11]  # K
-  data[76] = [0x10'u8, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1F]  # L
-  data[77] = [0x11'u8, 0x1_b, 0x15, 0x15, 0x11, 0x11, 0x11]  # M
-  data[78] = [0x11'u8, 0x11, 0x19, 0x15, 0x13, 0x11, 0x11]  # N
-  data[79] = [0x0E'u8, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0_e]  # O
-  data[80] = [0x1_e'u8, 0x11, 0x11, 0x1E, 0x10, 0x10, 0x10]  # P
-  data[81] = [0x0E'u8, 0x11, 0x11, 0x11, 0x15, 0x12, 0x0_d]  # Q
-  data[82] = [0x1_e'u8, 0x11, 0x11, 0x1E, 0x14, 0x12, 0x11]  # R
-  data[83] = [0x0E'u8, 0x11, 0x10, 0x0_e, 0x01, 0x11, 0x0_e]  # S
-  data[84] = [0x1_f'u8, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04]  # T
-  data[85] = [0x11'u8, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0_e]  # U
-  data[86] = [0x11'u8, 0x11, 0x11, 0x11, 0x0A, 0x0A, 0x04]  # V
-  data[87] = [0x11'u8, 0x11, 0x11, 0x15, 0x15, 0x1_b, 0x11]  # W
-  data[88] = [0x11'u8, 0x11, 0x0A, 0x04, 0x0A, 0x11, 0x11]  # X
-  data[89] = [0x11'u8, 0x11, 0x0_a, 0x04, 0x04, 0x04, 0x04]  # Y
-  data[90] = [0x1_f'u8, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1F]  # Z
+  data[65] = [0x0E'u8, 0x11, 0x11, 0x1_f, 0x11, 0x11, 0x11] # A
+  data[66] = [0x1_e'u8, 0x11, 0x11, 0x1E, 0x11, 0x11, 0x1E] # B
+  data[67] = [0x0E'u8, 0x11, 0x10, 0x10, 0x10, 0x11, 0x0_e] # C
+  data[68] = [0x1_e'u8, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1E] # D
+  data[69] = [0x1F'u8, 0x10, 0x10, 0x1_e, 0x10, 0x10, 0x1_f] # E
+  data[70] = [0x1_f'u8, 0x10, 0x10, 0x1E, 0x10, 0x10, 0x10] # F
+  data[71] = [0x0E'u8, 0x11, 0x10, 0x17, 0x11, 0x11, 0x0_f] # G
+  data[72] = [0x11'u8, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11] # H
+  data[73] = [0x0E'u8, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0_e] # I
+  data[74] = [0x07'u8, 0x02, 0x02, 0x02, 0x02, 0x12, 0x0C] # J
+  data[75] = [0x11'u8, 0x12, 0x14, 0x18, 0x14, 0x12, 0x11] # K
+  data[76] = [0x10'u8, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1F] # L
+  data[77] = [0x11'u8, 0x1_b, 0x15, 0x15, 0x11, 0x11, 0x11] # M
+  data[78] = [0x11'u8, 0x11, 0x19, 0x15, 0x13, 0x11, 0x11] # N
+  data[79] = [0x0E'u8, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0_e] # O
+  data[80] = [0x1_e'u8, 0x11, 0x11, 0x1E, 0x10, 0x10, 0x10] # P
+  data[81] = [0x0E'u8, 0x11, 0x11, 0x11, 0x15, 0x12, 0x0_d] # Q
+  data[82] = [0x1_e'u8, 0x11, 0x11, 0x1E, 0x14, 0x12, 0x11] # R
+  data[83] = [0x0E'u8, 0x11, 0x10, 0x0_e, 0x01, 0x11, 0x0_e] # S
+  data[84] = [0x1_f'u8, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04] # T
+  data[85] = [0x11'u8, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0_e] # U
+  data[86] = [0x11'u8, 0x11, 0x11, 0x11, 0x0A, 0x0A, 0x04] # V
+  data[87] = [0x11'u8, 0x11, 0x11, 0x15, 0x15, 0x1_b, 0x11] # W
+  data[88] = [0x11'u8, 0x11, 0x0A, 0x04, 0x0A, 0x11, 0x11] # X
+  data[89] = [0x11'u8, 0x11, 0x0_a, 0x04, 0x04, 0x04, 0x04] # Y
+  data[90] = [0x1_f'u8, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1F] # Z
 
   data
 
@@ -110,15 +110,14 @@ type
   Button = object
     x0, x1: uint32
     label: string
-    color: uint16
 
 let BUTTONS = [
-  Button(x0: 4, x1: 84, label: "PLAY", color: COLOR_UI_ACCENT),
-  Button(x0: 90, x1: 160, label: "STEP", color: COLOR_UI_TEXT),
-  Button(x0: 166, x1: 240, label: "CLEAR", color: COLOR_UI_TEXT),
-  Button(x0: 246, x1: 330, label: "RANDOM", color: COLOR_UI_TEXT),
-  Button(x0: 336, x1: 396, label: "SPD-", color: COLOR_UI_TEXT),
-  Button(x0: 402, x1: 462, label: "SPD+", color: COLOR_UI_TEXT),
+  Button(x0: 4, x1: 84, label: "PLAY"),
+  Button(x0: 90, x1: 160, label: "STEP"),
+  Button(x0: 166, x1: 240, label: "CLEAR"),
+  Button(x0: 246, x1: 330, label: "RANDOM"),
+  Button(x0: 336, x1: 396, label: "SPD-"),
+  Button(x0: 402, x1: 462, label: "SPD+"),
 ]
 
 # --- Color mapping ---
@@ -149,29 +148,33 @@ proc render_grid(fb: var Framebuffer, sim: Simulation) =
       for dy in 0'u32 ..< CELL_SIZE:
         fb.set_pixel(px + CELL_SIZE - 1, py + dy, COLOR_GRID)
 
+proc draw_rect(fb: var Framebuffer, x, y, w, h: uint32, color: uint16) =
+  for dy in 0'u32 ..< h:
+    for dx in 0'u32 ..< w:
+      fb.set_pixel(x + dx, y + dy, color)
+
 proc render_ui(fb: var Framebuffer, state: SimulationState, generation: uint64,
               step_interval: uint32) =
   let bar_y = DISPLAY_HEIGHT - UI_BAR_H
   let text_y = bar_y + (UI_BAR_H - FONT_H.uint32) div 2
 
   # Fill UI bar
-  for y in bar_y ..< DISPLAY_HEIGHT:
-    for x in 0'u32 ..< DISPLAY_WIDTH:
-      fb.set_pixel(x, y, COLOR_UI_BG)
+  draw_rect(fb, 0, bar_y, DISPLAY_WIDTH, UI_BAR_H, COLOR_UI_BG)
 
   # Draw buttons
   for btn in BUTTONS:
     var label = btn.label
-    var color = btn.color
     if btn.label == "PLAY":
       if state == Running:
         label = "PAUSE"
       else:
         label = "PLAY"
-        color = COLOR_UI_ACCENT
 
-    let text_x = btn.x0 + ((btn.x1 - btn.x0) - label.len.uint32 * (FONT_W + 1).uint32) div 2
-    draw_text(fb, text_x, text_y, label, color)
+    draw_rect(fb, btn.x0, bar_y + 4, btn.x1 - btn.x0, UI_BAR_H - 8, COLOR_UI_ACCENT)
+
+    let text_x = btn.x0 + ((btn.x1 - btn.x0) - label.len.uint32 * (FONT_W +
+        1).uint32) div 2
+    draw_text(fb, text_x, text_y, label, COLOR_UI_TEXT)
 
   # Generation counter + speed on right side
   draw_text(fb, 480, text_y, "GEN:" & $generation, COLOR_UI_TEXT)
@@ -179,55 +182,55 @@ proc render_ui(fb: var Framebuffer, state: SimulationState, generation: uint64,
 
 proc render(fb: var Framebuffer, sim: Simulation, state: SimulationState,
             step_interval: uint32) =
-  renderGrid(fb, sim)
-  renderUi(fb, state, sim.generation, step_interval)
+  render_grid(fb, sim)
+  render_ui(fb, state, sim.generation, step_interval)
 
 # --- Touch handling ---
 
-proc handleButton(x: int32, sim: var Simulation, state: var SimulationState,
+proc handle_button(x: int32, sim: var Simulation, state: var SimulationState,
                   step_interval: var uint32) =
   for i, btn in BUTTONS:
     if x.uint32 >= btn.x0 and x.uint32 < btn.x1:
       case i
-      of 0:  # PLAY/PAUSE
+      of 0: # PLAY/PAUSE
         state = if state == Running: Paused else: Running
-      of 1:  # STEP
+      of 1: # STEP
         if state == Paused:
           sim.step()
-      of 2:  # CLEAR
+      of 2: # CLEAR
         sim.clear()
         state = Paused
-      of 3:  # RANDOM
+      of 3: # RANDOM
         sim.randomize()
-      of 4:  # SPD-
+      of 4: # SPD-
         if step_interval < 30:
           step_interval += 1
-      of 5:  # SPD+
+      of 5: # SPD+
         if step_interval > 1:
           step_interval -= 1
       break
 
-proc handleTouch(event: TouchEvent, sim: var Simulation,
+proc handle_touch(event: TouchEvent, sim: var Simulation,
                  state: var SimulationState, step_interval: var uint32,
-                 drawing: var bool, drawValue: var uint8) =
+                 drawing: var bool, draw_value: var uint8) =
   case event.phase
   of Started:
     if event.y.uint32 >= GRID_AREA_H:
-      handleButton(event.x, sim, state, step_interval)
+      handle_button(event.x, sim, state, step_interval)
     else:
       let gx = event.x div CELL_SIZE.int32
       let gy = event.y div CELL_SIZE.int32
       if gx >= 0 and gx < GRID_W.int32 and gy >= 0 and gy < GRID_H.int32:
         let alive = sim.get(gx.int, gy.int)
-        drawValue = if alive != 0: 0'u8 else: 1'u8
-        sim.set(gx.int, gy.int, drawValue)
+        draw_value = if alive != 0: 0'u8 else: 1'u8
+        sim.set(gx.int, gy.int, draw_value)
         drawing = true
   of Moved:
     if drawing and event.y.uint32 < GRID_AREA_H:
       let gx = event.x div CELL_SIZE.int32
       let gy = event.y div CELL_SIZE.int32
       if gx >= 0 and gx < GRID_W.int32 and gy >= 0 and gy < GRID_H.int32:
-        sim.set(gx.int, gy.int, drawValue)
+        sim.set(gx.int, gy.int, draw_value)
   of Ended:
     drawing = false
 
@@ -239,19 +242,19 @@ proc app_main() {.exportc.} =
   const TAG: cstring = "GOL"
   logi(TAG, "Game of Life starting...")
 
-  var display = newDisplay()
-  var tc = newTouchController(DISPLAY_WIDTH, DISPLAY_HEIGHT)
-  var fb = newFramebuffer()
-  var sim = newSimulation(GRID_W, GRID_H)
+  var display = new_display()
+  var tc = new_touch_controller(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+  var fb = new_framebuffer()
+  var sim = new_simulation(GRID_W, GRID_H)
   sim.randomize()
 
   var state = Running
   var step_interval = STEP_INTERVAL_DEFAULT
   var step_counter = 0'u32
   var frame_count = 0'u32
-  var fps_timer = nowMs()
+  var fps_timer = now_ms()
   var drawing = false
-  var drawValue = 1'u8
+  var draw_value = 1'u8
 
   logi(TAG, "Entering main loop")
 

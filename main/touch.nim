@@ -54,18 +54,18 @@ proc new_touch_controller*(width, height: uint32): TouchController =
   # Drive INT pin (GPIO38) LOW to force GT911 address = 0x5D
   configure({GPIO_NUM_38}, mode = GPIO_MODE_OUTPUT)
   set_level(GPIO_NUM_38, 0'u32)
-  vTaskDelay(pdMS_TO_TICKS(50))
+  v_task_delay(pd_ms_to_ticks(50))
 
   # Release INT pin to input
   configure({GPIO_NUM_38}, mode = GPIO_MODE_INPUT)
-  vTaskDelay(pdMS_TO_TICKS(50))
+  v_task_delay(pd_ms_to_ticks(50))
 
   # Create I2C master bus
-  let bus = newI2cMasterBus(
-    i2cPort = 0.cint,
+  let bus = new_i2c_master_bus(
+    i2c_port = 0.cint,
     sda = GPIO_NUM_19,
     scl = GPIO_NUM_20,
-    enableInternalPullup = true
+    enable_internal_pullup = true
   )
 
   # Probe for GT911
@@ -77,11 +77,11 @@ proc new_touch_controller*(width, height: uint32): TouchController =
     if bus.probe(GT911_ADDR_SECONDARY):
       address = GT911_ADDR_SECONDARY
       break
-    vTaskDelay(pdMS_TO_TICKS(50))
+    v_task_delay(pd_ms_to_ticks(50))
 
-  let dev = bus.addDevice(
-    deviceAddress = I2cAddr(address),
-    sclSpeedHz = 100_000.Hertz
+  let dev = bus.add_device(
+    device_address = I2cAddr(address),
+    scl_speed_hz = 100_000.Hertz
   )
 
   result = TouchController(
