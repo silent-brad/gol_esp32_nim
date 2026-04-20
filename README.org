@@ -6,7 +6,8 @@
 
 Conway's Game of Life running on an _ESP32-S3_ with an _Elecrow 5" 800×480 RGB panel_ and _GT911 capacitive touch controller_. Written in Nim, compiled to C via ESP-IDF.
 
-Ported from [[https://github.com/silent-brad/gol_esp32_rs][gol_esp32_rs]].
+** Display
+[[Elecrow ESP32 5-inch Display][https://www.amazon.com/ELECROW-Dual-Core-Compatible-PlatformIO-MicroPython/dp/B0DL5WB7RQ/ref=sr_1_3?sr=8-3]] (800×480 RGB565)
 
 ** Features
 
