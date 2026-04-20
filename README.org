@@ -8,9 +8,9 @@ Conway's Game of Life running on an _ESP32-S3_ with an _Elecrow 5" 800×480 RGB 
 
 ** Photos
 
-[[file:imgs/game-of-life-esp32-1.jpg]]
+[[file:imgs/game-of-life-esp32.gif]]
 
-[[file:imgs/game-of-life-esp32-2.jpg]]
+[[file:imgs/game-of-life-esp32.jpg]]
 
 ** Display
 [[Elecrow ESP32 5-inch Display][https://www.amazon.com/ELECROW-Dual-Core-Compatible-PlatformIO-MicroPython/dp/B0DL5WB7RQ/ref=sr_1_3?sr=8-3]] (800×480 RGB565)
